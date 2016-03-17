@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -72,6 +73,54 @@ public class Services {
 		Boolean status = UserModel.updateUserPosition(Integer.parseInt(id), Double.parseDouble(lat), Double.parseDouble(lon));
 		JSONObject json = new JSONObject();
 		json.put("status", status ? 1 : 0);
+		return json.toJSONString();
+	}
+	@POST
+	@Path("/userCurrentLoscation")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String currentLocation(@FormParam("id") String id)
+	{
+		Double[] longLat = UserModel.returnUserLocation(Integer.parseInt(id));
+		JSONObject json = new JSONObject();
+		json.put("long",longLat[0]);
+		json.put("lat",longLat[1]);
+		return json.toJSONString();
+	}
+
+	@POST
+	@Path("/followUser")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String followUser(@FormParam("userId") String userId,
+			@FormParam("followedId") String followedId) 
+	{
+		Boolean isfollowed = UserModel.followUser(Integer.parseInt(userId), Integer.parseInt(followedId));
+		JSONObject json = new JSONObject();
+		json.put("isfollowed", isfollowed);
+		return json.toJSONString();
+		//return isfollowed;
+	}
+	@POST
+	@Path("/unfollow")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String unfollow(@FormParam("userId") String userId,
+			@FormParam("followedId") String followedId) {
+		boolean retn = UserModel.unfollow(Integer.parseInt(userId), Integer.parseInt(followedId));
+		JSONObject json = new JSONObject();
+		json.put("unfollowed", retn);
+		return json.toJSONString();
+	}
+	
+	@POST
+	@Path("/getfollowers")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getfolloweds(@FormParam("id") String id) {
+		ArrayList<UserModel> status = UserModel.Get_Followers(Integer.parseInt(id));
+		JSONObject json = new JSONObject();
+		for (int i = 0; i < status.size(); i++) {
+			json.put("followers", status.get(i).toString());
+		}
+		
+//		System.out.println(status.toString());
 		return json.toJSONString();
 	}
 
